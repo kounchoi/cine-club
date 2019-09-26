@@ -20,7 +20,12 @@ if __name__ == '__main__':
     arg_parser.add_argument(
         '-n', '--number', type=int, default=3,
         help='Number of movies to select.')
+    arg_parser.add_argument(
+        '-e', '--exclude', action='append', default=[],
+        help='Exclude proposals from these people.'
+    )
     args = arg_parser.parse_args()
+    args.exclude = set(args.exclude)
 
     if not re.match(r'^\d{4}-\d{2}-\d{2}$', args.date):
         raise RuntimeError(
@@ -30,7 +35,8 @@ if __name__ == '__main__':
     with open(args.database) as f:
         proposals = [
             movie for movie in yaml.safe_load(f)
-            if 'watched' not in movie
+            if ('watched' not in movie
+                and movie['proponent'] not in args.exclude)
         ]
 
 
